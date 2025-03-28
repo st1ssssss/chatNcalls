@@ -2,11 +2,9 @@
 import { ref } from 'vue'
 
 defineProps<{ msg: string }>()
-
 </script>
 
-<template>
-</template>
+<template>sdfsdfsd</template>
 
 <style scoped>
 .read-the-docs {
