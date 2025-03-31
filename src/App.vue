@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import HomePage from '@/components/HomePage.vue'
+  import { RouterView } from 'vue-router';
 </script>
 
 <template>
-  <HomePage msg="Vite + Vue" />
+  <RouterView />
 </template>
 
 <style scoped>

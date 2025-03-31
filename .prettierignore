@@ -1,0 +1,7 @@
+dist
+node_modules
+*.md
+*.svg
+*.lock
+.env
+.DS_Store

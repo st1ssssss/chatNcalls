@@ -1,7 +1,7 @@
-import eslintPluginVue from 'eslint-plugin-vue'
-import eslintPluginPrettier from 'eslint-plugin-prettier/recommended'
 import typescriptEslint from '@typescript-eslint/eslint-plugin'
 import typescriptParser from '@typescript-eslint/parser'
+import eslintPluginPrettier from 'eslint-plugin-prettier/recommended'
+import eslintPluginVue from 'eslint-plugin-vue'
 import vueParser from 'vue-eslint-parser'
 
 export default [
@@ -47,7 +47,18 @@ export default [
       // Vue rules
       'vue/multi-word-component-names': 'off',
       'vue/require-default-prop': 'off',
-      'vue/component-api-style': ['error', ['script-setup']]
+      'vue/component-api-style': ['error', ['script-setup']],
+      'prettier/prettier': [
+        'error',
+        {
+          printWidth: 100,
+          semi: false,
+          singleQuote: true,
+          trailingComma: 'none',
+          bracketSpacing: true,
+          arrowParens: 'avoid'
+        }
+      ]
     }
   },
   {
