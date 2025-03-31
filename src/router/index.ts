@@ -6,8 +6,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
   { path: '/', redirect: '/auth' },
   { path: '/auth', component: AuthPage },
-  { path: '/chat', component: CallPage },
-  { path: '/call', component: ChatPage }
+  { path: '/chat', component: ChatPage },
+  { path: '/call', component: CallPage }
 ]
 
 export const router = createRouter({

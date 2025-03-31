@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "server": "node ./src/server/index.js",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext .ts,.vue",
@@ -12,7 +13,10 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "express": "^4.21.2",
+    "peerjs": "^1.5.4",
     "pinia": "^3.0.1",
+    "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
