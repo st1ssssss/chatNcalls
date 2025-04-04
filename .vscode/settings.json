@@ -6,7 +6,7 @@
       "source.organizeImports": "explicit"
     },
     "[vue]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
+      "editor.defaultFormatter": "dbaeumer.vscode-eslint"
     },
     "[typescript]": {
       "editor.defaultFormatter": "esbenp.prettier-vscode"

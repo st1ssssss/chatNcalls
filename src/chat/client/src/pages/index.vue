@@ -41,26 +41,26 @@
 </template>
 
 <script lang="ts" setup>
-import { io, type Socket } from 'socket.io-client';
-import { onBeforeUnmount, onMounted, ref } from 'vue';
-
-const socket = ref<Socket>();
   const router = useRouter();
-const rooms = ['vue installation', 'vue guide', 'vue api', 'vue examples'];
-const state = reactive({
-  username: '',
-  room: rooms[0],
-});
-const onSubmit = () => {
-  console.log('[SUBMIT]');
-  router.push(`/chat?username=${state.username}&room=${state.room}`);
-};
+  const rooms = ['vue installation', 'vue guide', 'vue api', 'vue examples'];
+  const state = reactive({
+    username: '',
+    room: rooms[0],
+  });
+  const onSubmit = () => {
+    console.log('[SUBMIT]');
+    router.push(`/chat?username=${state.username}&room=${state.room}`);
+  };
+  
+  import { io, type Socket } from 'socket.io-client';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
+  const socket = ref<Socket>();
 
-onMounted(() => {
-  socket.value = io('http://localhost:3001')
-});
-onBeforeUnmount(() => {
-  console.log('[DISCONNECT_BLOCK]');
-  socket.value?.disconnect();
-})
+  onMounted(() => {
+    socket.value = io('http://localhost:3001')
+  });
+  onBeforeUnmount(() => {
+    console.log('[DISCONNECT_BLOCK]');
+    socket.value?.disconnect();
+  })
 </script>

@@ -1,7 +1,7 @@
 import express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
-import { userJoin } from './utils'
+import { botMessage, formatMessage, userJoin } from './utils.js'
 
 const app = express()
 const server = createServer(app)
@@ -18,6 +18,15 @@ io.on('connection', socket => {
   socket.on('joinRoom', payload => {
     const user = userJoin({ ...payload, id: socket.id })
     socket.join(user.room)
+
+    socket.broadcast
+      .to(user.room)
+      .emit('message', formatMessage(botMessage, `${user.username} has joined the chat`))
+
+    io.to(user.room).emit('roomUsers', {
+      room: user.room,
+      users: getRoomUsers(user.room)
+    })
   })
 })
 
