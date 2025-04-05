@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-export const botMessage = 'Welcome to Metran'
+export const botName = 'Welcome to Metran'
 export const users = []
 
 export function userJoin(user) {
@@ -26,4 +26,8 @@ export function userLeave(id) {
   if (index !== -1) {
     return users.splice(index, 1)[0]
   }
+}
+
+export function getCurrentUser(id){
+  return users.find(user => user.id === id)
 }

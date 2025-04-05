@@ -51,16 +51,4 @@
     console.log('[SUBMIT]');
     router.push(`/chat?username=${state.username}&room=${state.room}`);
   };
-  
-  import { io, type Socket } from 'socket.io-client';
-import { onBeforeUnmount, onMounted, ref } from 'vue';
-  const socket = ref<Socket>();
-
-  onMounted(() => {
-    socket.value = io('http://localhost:3001')
-  });
-  onBeforeUnmount(() => {
-    console.log('[DISCONNECT_BLOCK]');
-    socket.value?.disconnect();
-  })
 </script>

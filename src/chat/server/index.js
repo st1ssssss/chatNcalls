@@ -1,7 +1,7 @@
 import express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
-import { botMessage, formatMessage, userJoin } from './utils.js'
+import { botName, formatMessage, getCurrentUser, getRoomUsers, userJoin, userLeave } from './utils.js'
 
 const app = express()
 const server = createServer(app)
@@ -21,12 +21,33 @@ io.on('connection', socket => {
 
     socket.broadcast
       .to(user.room)
-      .emit('message', formatMessage(botMessage, `${user.username} has joined the chat`))
+      .emit('message', formatMessage(botName, `${user.username} has joined the chat`))
 
     io.to(user.room).emit('roomUsers', {
       room: user.room,
       users: getRoomUsers(user.room)
     })
+  })
+
+  socket.on('chatMessage', (msg) => {
+    const user = getCurrentUser(user.id)
+    if (user)
+    {
+      io.to(user.room).emit('message', formatMessage(user.username, msg))
+    }
+  })
+
+  socket.on('disconnect', () => {
+    const user = userLeave(socket.id)
+    if (user)
+    {
+      io.to(user.room)
+      .emit('message', formatMessage(botName, `${user.username} has left the chat`))
+      io.to(user.room).emit('roomUsers', {
+        room: user.room,
+        users: getRoomUsers(user.room)
+      })
+    }
   })
 })
 
