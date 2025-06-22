@@ -7,9 +7,13 @@
       >
         <VCardTitle>
           <div class="d-flex align-center justify-center">
-            <VIcon icon="mdi-chat" />
+            <img
+              src="@/assets/logo.svg"
+              alt="Logo"
+              class="icon"
+            >
             <h3 class="ml-2">
-              Vue Chatapp
+              etran Chat
             </h3>
           </div>
         </VCardTitle>
@@ -18,10 +22,11 @@
             v-model="state.username"
             label="Username"
           />
-          <VSelect
+          <v-combobox
             v-model="state.room"
             :items="rooms"
             label="Room"
+            clearable
           />
         </VCardText>
         <VCardActions>
@@ -32,7 +37,7 @@
             variant="outlined"
             type="submit"
           >
-            Join Chatapp
+            Join
           </VBtn>
         </VCardActions>
       </VCard>
@@ -41,12 +46,24 @@
 </template>
 
 <script lang="ts" setup>
+  import { io } from 'socket.io-client';
   const router = useRouter();
-  const rooms = ['vue installation', 'vue guide', 'vue api', 'vue examples'];
+  let rooms = [''];
   const state = reactive({
-    username: '',
+    username: [''],
     room: rooms[0],
   });
+
+  onMounted(() => {
+    const socket = io("http://localhost:3001");
+
+    // при новом сообщении — добавляем в чат
+    socket?.on('getRooms', (roomsRead: string[]) => {
+      rooms = roomsRead
+    })
+  
+  });
+
   const onSubmit = () => {
     console.log('[SUBMIT]');
     router.push(`/chat?username=${state.username}&room=${state.room}`);

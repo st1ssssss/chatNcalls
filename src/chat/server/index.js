@@ -1,6 +1,8 @@
-import express from "express";
-import { createServer } from "http";
-import { Server } from "socket.io";
+import express from 'express'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
+import { open } from 'sqlite'
+import sqlite3 from 'sqlite3'
 import {
   botName,
   formatMessage,
@@ -8,63 +10,142 @@ import {
   getRoomUsers,
   userJoin,
   userLeave
-} from "./utils.js";
+} from './utils.js'
 
-const app = express();
-
-const server = createServer(app);
+sqlite3.verbose()
+const app = express()
+app.use(express.json())
+const server = createServer(app)
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+})
 
-io.on("connection", (socket) => {
-  socket.on("joinRoom", (payload) => {
-    const user = userJoin({ ...payload, id: socket.id });
-    socket.join(user.room);
-    console.log("IN Join Room Event");
-    socket.broadcast
-      .to(user.room)
-      .emit(
-        "message",
-        formatMessage(botName, `${user.username} has joined the chat`)
-      );
- 
-    io.to(user.room).emit("roomUsers", {
-      room: user.room,
-      users: getRoomUsers(user.room),
-    });
-  });
+io.on('connection', socket => {
+  socket.on('joinRoom', async payload => {
+    const user = userJoin({ ...payload, id: socket.id })
+    socket.join(user.room)
 
-  socket.on('chatMessage', (msg) => {
+    // Открываем или создаём файл базы данных
+    const db = await open({
+      filename: './chat.db',
+      driver: sqlite3.Database
+    })
 
-    const user = getCurrentUser(socket.id)
-    if(user){
-        io.to(user.room).emit('message', formatMessage(user.username, msg))
-    }
+    // 1. Создаём таблицу (если нет)
+    await db.exec(`
+    CREATE TABLE IF NOT EXISTS messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT,
+      text TEXT,
+      time TEXT,
+      room TEXT
+    )
+  `)
 
-  })
-  socket.on("disconnect", () => {
-    const user = userLeave(socket.id);
+    // 3. Получаем все сообщения
+    const messages = await db.all('SELECT * FROM messages ORDER BY id ASC')
+
     if (user) {
       io.to(user.room).emit(
-        "message",
-        formatMessage(botName, `${user.username} has left the chat`)
-      );
-      io.to(user.room).emit("roomUsers", {
-        room: user.room,
-        users: getRoomUsers(user.room),
-      });
+        'loadMessages',
+        messages.filter(mess => mess.room == user.room) //.map(x => [x.id, x.username, x.text, x.time])
+      )
     }
-  });
-});
 
-const PORT = 3001 || process.env.PORT;
+    await db.close()
+
+    console.log('IN Join Room Event')
+    socket.broadcast
+      .to(user.room)
+      .emit('message', formatMessage(botName, `${user.username} has joined the chat`))
+
+    io.to(user.room).emit('roomUsers', {
+      room: user.room,
+      users: getRoomUsers(user.room)
+    })
+  })
+
+  socket.on('chatMessage', async msg => {
+    const user = getCurrentUser(socket.id)
+    if (user) {
+      var newMessage = formatMessage(user.username, msg)
+
+      io.to(user.room).emit('message', newMessage)
+
+      // Открываем или создаём файл базы данных
+      const db = await open({
+        filename: './chat.db',
+        driver: sqlite3.Database
+      })
+
+      // 1. Создаём таблицу (если нет)
+      await db.exec(`
+    CREATE TABLE IF NOT EXISTS messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT,
+      text TEXT,
+      time TEXT,
+      room TEXT
+    )
+  `)
+
+      await db.run('INSERT INTO messages (username, text, time, room) VALUES (?, ?, ?, ?)', [
+        newMessage.username,
+        newMessage.text,
+        newMessage.time,
+        user.room
+      ])
+
+      await db.close()
+    }
+  })
+
+  socket.on('getRooms', async msg => {
+    // Открываем или создаём файл базы данных
+    const db = await open({
+      filename: './chat.db',
+      driver: sqlite3.Database
+    })
+
+    // 1. Создаём таблицу (если нет)
+    await db.exec(`
+    CREATE TABLE IF NOT EXISTS messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT,
+      text TEXT,
+      time TEXT,
+      room TEXT
+    )
+  `)
+
+    // 3. Получаем все сообщения
+    const messages = await db.all('SELECT * FROM messages ORDER BY id ASC')
+
+    io.emit(
+      'getRooms',
+      messages.map(mess => mess.room).filter((item, index) => arr.indexOf(item) === index) //.map(x => [x.id, x.username, x.text, x.time])
+    )
+  })
+
+  socket.on('disconnect', () => {
+    const user = userLeave(socket.id)
+    if (user) {
+      io.to(user.room).emit('message', formatMessage(botName, `${user.username} has left the chat`))
+      io.to(user.room).emit('roomUsers', {
+        room: user.room,
+        users: getRoomUsers(user.room)
+      })
+    }
+  })
+})
+
+const PORT = 3001 || process.env.PORT
 
 server.listen(PORT, () => {
-  console.log("Server is running");
-});
+  console.log('Server is running')
+})
