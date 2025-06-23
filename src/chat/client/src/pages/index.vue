@@ -7,9 +7,13 @@
       >
         <VCardTitle>
           <div class="d-flex align-center justify-center">
-            <VIcon icon="mdi-chat" />
+            <img
+              src="@/assets/logo.svg"
+              alt="Logo"
+              class="icon"
+            >
             <h3 class="ml-2">
-              Vue Chatapp
+              etran Chat
             </h3>
           </div>
         </VCardTitle>
@@ -18,10 +22,11 @@
             v-model="state.username"
             label="Username"
           />
-          <VSelect
+          <v-combobox
             v-model="state.room"
             :items="rooms"
             label="Room"
+            clearable
           />
         </VCardText>
         <VCardActions>
@@ -32,7 +37,7 @@
             variant="outlined"
             type="submit"
           >
-            Join Chatapp
+            Join
           </VBtn>
         </VCardActions>
       </VCard>
@@ -42,13 +47,43 @@
 
 <script lang="ts" setup>
   const router = useRouter();
-  const rooms = ['vue installation', 'vue guide', 'vue api', 'vue examples'];
+  const rooms = ref(['']);
   const state = reactive({
-    username: '',
+    username: [''],
     room: rooms[0],
   });
+
+  onMounted(() => {
+    
+    // Проверяем и инициализируем пустой массив комнат, если ничего нет
+    if (!localStorage.getItem('rooms')) {
+      localStorage.setItem('rooms', JSON.stringify([]));
+    }
+
+    rooms.value = JSON.parse(localStorage.getItem('rooms') || '[]');
+  });
+
   const onSubmit = () => {
     console.log('[SUBMIT]');
     router.push(`/chat?username=${state.username}&room=${state.room}`);
+    addRoom(state.room)
   };
+
+
+  function addRoom(roomName) {
+  // 1. Получаем текущий список комнат
+  const rooms = JSON.parse(localStorage.getItem('rooms') || '[]');
+  
+  // 2. Проверяем, нет ли уже такой комнаты (опционально)
+  if (!rooms.includes(roomName)) {
+    // 3. Добавляем новую комнату
+    rooms.push(roomName);
+    
+    // 4. Сохраняем обновлённый список
+    localStorage.setItem('rooms', JSON.stringify(rooms));
+    console.log(`Комната "${roomName}" добавлена`);
+  } else {
+    console.log(`Комната "${roomName}" уже существует`);
+  }
+}
 </script>
