@@ -1,13 +1,24 @@
 <template>
-  <video ref="localVideo" autoplay muted playsinline></video>
-  <video ref="remoteVideo" autoplay playsinline></video>
-  <button @click="joinRoom">join</button>
-  <button @click="startCall">call</button>
+  <div class="w-full h-full flex flex-col items-center justify-between">
+    <div class="flex justify-between gap-3.5">
+      <VideoCell class="w-2xl h-96 bg-violet-300" ref="localVideo" autoplay muted playsinline></VideoCell>
+      <VideoCell class="w-2xl h-96 bg-violet-300" ref="remoteVideo" autoplay playsinline></VideoCell>
+    </div>
+    <div class="flex gap-1">
+      <button @click="joinRoom">join</button>
+      <button @click="startCall">call</button>
+            <button @click="joinRoom">join</button>
+      <button @click="startCall">call</button>
+            <button @click="joinRoom">join</button>
+      <button @click="startCall">call</button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { io, Socket } from 'socket.io-client'
 import { onMounted, ref } from 'vue'
+import VideoCell from '../components/VideoCell.vue'
 
 const socket = ref<Socket>()
 const localStream = ref<MediaStream>()

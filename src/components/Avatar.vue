@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import avatar from './base-avatar.svg'
+import avatar from '@/assets/base-avatar.svg';
 defineProps<{ userName: string; imgSrc?: string }>()
 </script>
 
