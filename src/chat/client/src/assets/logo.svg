@@ -1,6 +1,6 @@
-<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="250" height="44" viewBox="145 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
   <!-- Градиентный фон -->
-  <rect width="64" height="64" rx="12" fill="url(#grad)"/>
+  <rect transform="translate(0, 6)" width="355" height="54" rx="12" fill="url(#grad)"/>
   <defs>
     <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#1E3A8A"/>
@@ -9,6 +9,24 @@
   </defs>
 
   <!-- Буква М с эффектом переплетения -->
-  <path d="M16 44V20L32 40L48 20V44" stroke="white" stroke-width="4" stroke-linecap="round"/>
-  <path d="M24 28L32 36L40 28" stroke="#BFDBFE" stroke-width="3" stroke-linecap="round"/>
+  <path transform="translate(-11, -4)" d="M27.92,30.05v24.51h-10.1v-36.2c0-0.71,0.27-0.93,1.09-0.93h8.95c0.71,0,1.09,0.22,1.36,0.71l14.3,22.11 l13.65-21.89c0.38-0.6,0.6-0.93,1.42-0.93h9.28v37.12h-10.1V29.88L43.37,53.47h-0.22L27.92,30.05z" stroke="white" fill="white"/>
+
+<path transform="translate(-11, -4)" d="M84.93,49.65h16.6v4.91H73.46V25.57c0-0.6,0.27-0.71,0.87-0.71h27.63l-1.75,4.91H84.93v6.61h13.54v4.91H84.93V49.65z" stroke="white" fill="white"/>
+
+<path transform="translate(-11, -4)" d="M114.85,54.56V30.21h-10.92v-5.35h34.18l-2.18,5.35h-9.61v24.35H114.85z" stroke="white" fill="white"/>
+
+<path transform="translate(-11, -4)" d="M140.24,54.56V25.74c0-0.76,0.16-0.87,1.04-0.87h12.99c10.15,0,16.65,1.97,16.65,9.61c0,6.77-6.44,10.16-16.65,10.16h-2.57v9.94H140.24z M151.7,39.71h2.57c3.17,0,4.75-1.26,4.75-5.19c0-3.99-1.91-4.75-4.7-4.75h-2.62V39.71z" stroke="white" fill="white"/>
+
+<path transform="translate(-11, -4)" d="M173.1,54.56h-5.62l12.67-29.7h11.47l12.67,28.94c0.22,0.55-2.08,0.76-2.73,0.76h-9.23l-2.62-6.17h-11.57l-2.29,5.4C175.61,54.34,173.76,54.56,173.1,54.56z M183.97,34.85l-3.71,8.63h7.37L183.97,34.85z" stroke="white" fill="white"/>
+
+<path transform="translate(-11, -4)" d="M230.32,41.3h-12.56v13.27H206.3V25.63c0-0.6,0.22-0.76,0.87-0.76h10.59v11.52h12.56V25.63c0-0.6,0.22-0.76,0.87-0.76h10.59v29.7h-11.47V41.3z" stroke="white" fill="white"/>
+
+<path transform="translate(418, -4) scale(-1, 1)" fill-rule="evenodd" d="M140.24,54.56V25.74c0-0.76,0.16-0.87,1.04-0.87h12.99c17.15,0,16.65,0,16.65,9.61c0,6.77-6.44,10.16-16.65,10.16h-2.57v9.94H140.24z" stroke="white" fill="white"/>
+
+<path transform="translate(418, -4) scale(-1, 1)" fill-rule="evenodd" d="M153.7,39.71h2.57c3.17,0,4.75-1.26,4.75-13.19c0-3.99-1.91-4.75-6.7-2.55h-2.62V39.71z" fill="url(#grad)"/>
+
+<path transform="translate(115, -4)" d="M173.1,54.56h-5.62l12.67-29.7h11.47l12.67,28.94c0.22,0.55-2.08,0.76-2.73,0.76h-9.23l-2.62-6.17h-11.57l-2.29,5.4C175.61,54.34,173.76,54.56,173.1,54.56z M183.97,34.85l-3.71,8.63h7.37L183.97,34.85z" stroke="white" fill="white"/>
+
+<path transform="translate(210, -4)" d="M114.85,54.56V30.21h-10.92v-5.35h34.18l-2.18,5.35h-9.61v24.35H114.85z" stroke="white" fill="white"/>
+
 </svg>
