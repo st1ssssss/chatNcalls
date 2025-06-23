@@ -1,5 +1,6 @@
+@import 'inter-ui/inter.css';
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -13,15 +14,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
 body {
   margin: 0;
   display: flex;
@@ -29,12 +21,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
+/* 
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -52,17 +39,13 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
-
-.card {
-  padding: 2em;
-}
+} */
 
 #app {
-  max-width: 1280px;
+  width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
+  height: 90vh
 }
 
 @media (prefers-color-scheme: light) {
@@ -76,4 +59,25 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+@import 'tailwindcss';
+@theme {
+  --color-brand-100: #e1d9f3;
+  --color-brand-200: #c3b3e8;
+  --color-brand-300: #a58ddc;
+  --color-brand-400: #8766d1;
+  --color-brand-500: #6941c6;
+  --color-brand-600: #3f2776;
+  --color-brand-700: #3f2776;
+  --color-brand-800: #2a1a4f;
+  --color-brand-900: #1f133b;
+  --color-feedback-100: #d1fadf;
+  --color-feedback-200: #12b76a;
+  --color-feedback-300: #0b7443;
+  --color-feedback-400: #feefc6;
+  --color-feedback-500: #f79009;
+  --color-feedback-600: #ad6406;
+  --color-feedback-700: #fee4e2;
+  --color-feedback-800: #f04438;
+  --color-feedback-900: #a6170d;
 }

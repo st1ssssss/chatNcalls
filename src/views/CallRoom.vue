@@ -1,8 +1,6 @@
 <template>
-<h2>
-  callRoom
-</h2>
-<!-- <button @click="()=>{
+  <h2>callRoom</h2>
+  <!-- <button @click="()=>{
       router.push(`/call/${v4()}`)
     }">Create new room</button>
 <ul>

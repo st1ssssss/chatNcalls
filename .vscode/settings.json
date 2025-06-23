@@ -1,20 +1,27 @@
 {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit",
-      "source.organizeImports": "explicit"
-    },
-    "[vue]": {
-      "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-    },
-    "[typescript]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[javascript]": {
-      "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-    },
-    "prettier.enable": true,
-    "eslint.format.enable": true,
-    "typescript.tsdk": "node_modules/typescript/lib"
-  }
+  "editor.tabSize": 2,
+
+  // Замените табы пробелами
+  "editor.insertSpaces": true,
+
+  // Отключите автоопределение отступов (чтобы настройки не перезаписывались)
+  "editor.detectIndentation": false,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "[vue]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "prettier.enable": true,
+  "eslint.format.enable": true,
+  "typescript.tsdk": "node_modules/typescript/lib"
+}
