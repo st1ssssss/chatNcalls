@@ -46,26 +46,44 @@
 </template>
 
 <script lang="ts" setup>
-  import { io } from 'socket.io-client';
   const router = useRouter();
-  let rooms = [''];
+  const rooms = ref(['']);
   const state = reactive({
     username: [''],
     room: rooms[0],
   });
 
   onMounted(() => {
-    const socket = io("http://localhost:3001");
+    
+    // Проверяем и инициализируем пустой массив комнат, если ничего нет
+    if (!localStorage.getItem('rooms')) {
+      localStorage.setItem('rooms', JSON.stringify([]));
+    }
 
-    // при новом сообщении — добавляем в чат
-    socket?.on('getRooms', (roomsRead: string[]) => {
-      rooms = roomsRead
-    })
-  
+    rooms.value = JSON.parse(localStorage.getItem('rooms') || '[]');
   });
 
   const onSubmit = () => {
     console.log('[SUBMIT]');
     router.push(`/chat?username=${state.username}&room=${state.room}`);
+    addRoom(state.room)
   };
+
+
+  function addRoom(roomName) {
+  // 1. Получаем текущий список комнат
+  const rooms = JSON.parse(localStorage.getItem('rooms') || '[]');
+  
+  // 2. Проверяем, нет ли уже такой комнаты (опционально)
+  if (!rooms.includes(roomName)) {
+    // 3. Добавляем новую комнату
+    rooms.push(roomName);
+    
+    // 4. Сохраняем обновлённый список
+    localStorage.setItem('rooms', JSON.stringify(rooms));
+    console.log(`Комната "${roomName}" добавлена`);
+  } else {
+    console.log(`Комната "${roomName}" уже существует`);
+  }
+}
 </script>

@@ -105,33 +105,6 @@ io.on('connection', socket => {
     }
   })
 
-  socket.on('getRooms', async msg => {
-    // Открываем или создаём файл базы данных
-    const db = await open({
-      filename: './chat.db',
-      driver: sqlite3.Database
-    })
-
-    // 1. Создаём таблицу (если нет)
-    await db.exec(`
-    CREATE TABLE IF NOT EXISTS messages (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT,
-      text TEXT,
-      time TEXT,
-      room TEXT
-    )
-  `)
-
-    // 3. Получаем все сообщения
-    const messages = await db.all('SELECT * FROM messages ORDER BY id ASC')
-
-    io.emit(
-      'getRooms',
-      messages.map(mess => mess.room).filter((item, index) => arr.indexOf(item) === index) //.map(x => [x.id, x.username, x.text, x.time])
-    )
-  })
-
   socket.on('disconnect', () => {
     const user = userLeave(socket.id)
     if (user) {
