@@ -12,7 +12,7 @@ export function formatMessage(username, text) {
   return {
     username,
     text,
-    time: moment().format('h:mm a')
+    time: moment().format('YYYY-MM-DD HH:mm')
   }
 }
 
@@ -28,6 +28,6 @@ export function userLeave(id) {
   }
 }
 
-export function getCurrentUser(id){
+export function getCurrentUser(id) {
   return users.find(user => user.id === id)
 }
