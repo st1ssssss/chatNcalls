@@ -1,13 +1,24 @@
 <template>
-  <VContainer>
-    <VCard class="mx-auto pa-5">
-      <VCardTitle class="pb-5">
+  <VContainer
+    fluid
+    class="pa-0 fill-height d-flex align-start "
+  >
+    <VCard
+      class="d-flex flex-column fill-height"
+      style="width: 100%; "
+    >
+      <!-- Header -->
+      <VCardTitle
+        class="pb-5"
+        style="background-color: #172657; border-radius: 10px;"
+      >
         <div class="d-flex align-center justify-space-between text-primary">
           <div class="d-flex align-center">
-            <VIcon icon="mdi-chat" />
-            <div class="font-weight-bold text-h6 ml-2">
-              Metran Chat
-            </div>
+            <img
+              src="@/assets/logo.svg"
+              alt="Logo"
+              class="icon"
+            >
           </div>
           <VBtn
             color="primary"
@@ -19,27 +30,46 @@
           </VBtn>
         </div>
       </VCardTitle>
+
       <VDivider />
-  
-      <VCardText class="py-6 px-0">
-        <div class="d-flex">
+
+      <!-- Chat content -->
+      <VCardText class="py-6 px-0 flex-grow-1 overflow-y-auto">
+        <div
+          class="d-flex fill-height"
+          style="border-radius: 10px; "
+        >
           <!-- Sidebar -->
-          <div class="bg-grey-lighten-3 py-4 px-6">
+          <div
+            class="bg-grey-lighten-3 py-4 px-6"
+            style="border-radius: 10px; min-width: 200px;"
+          >
             <div class="mb-4">
-              <div class="d-flex align-center mb-2 px-3 py-2 rounded-md bg-white">
+              <div
+                class="d-flex align-center mb-2 px-3 py-2 rounded-md bg-white"
+                style="border-radius: 10px;"
+              >
                 <VIcon icon="mdi-chat-outline" />
                 <div class="text-body-1 ml-2 text-capitalize">
                   {{ currentRoom }}
                 </div>
               </div>
             </div>
-            <div class="d-flex align-center mb-2 px-3 py-2 rounded-md bg-white">
+
+            <div
+              class="d-flex align-center mb-2 px-3 py-2 rounded-md bg-white"
+              style="border-radius: 10px;"
+            >
               <VIcon icon="mdi-account-group-outline" />
               <div class="text-body-1 ml-2">
                 Users
               </div>
             </div>
-            <v-list>
+
+            <v-list
+              style="border-radius: 10px;"
+              class=" bg-white"
+            >
               <v-list-item
                 v-for="(user, i) in users"
                 :key="i"
@@ -49,11 +79,9 @@
               </v-list-item>
             </v-list>
           </div>
-          <!-- Chat -->
-          <div
-            style="height: 400px"
-            class="overflow-y-auto pl-6 flex-fill"
-          >
+
+          <!-- Chat messages -->
+          <div class="overflow-y-auto pl-6 flex-fill">
             <div
               v-for="(chat, i) in chats"
               :key="i"
@@ -66,16 +94,15 @@
             >
               <div
                 class="px-6 py-2 w-50 rounded-md mb-3"
+                style="border-radius: 10px;"
                 :class="{
                   'bg-red-lighten-4': chat.username === 'Vue Chatapp Admin',
                   'bg-blue-lighten-5': chat.username === route.query.username,
-                  'bg-light-green-lighten-4':
-                    chat.username !== route.query.username &&
-                    chat.username !== 'Vue Chatapp Admin',
+                  'bg-light-green-lighten-4': chat.username !== route.query.username && chat.username !== 'Vue Chatapp Admin',
                 }"
               >
                 <div class="d-flex align-center gap-x-3">
-                  <div class="text-xs text-primary font-semibold">
+                  <div class="text-xs text-primary font-semibold mr-4">
                     {{ chat.username }}
                   </div>
                   <div class="text-xs">
@@ -90,7 +117,10 @@
           </div>
         </div>
       </VCardText>
+
       <VDivider />
+
+      <!-- Footer / Input -->
       <VCardActions class="pt-6">
         <form
           class="w-100"
@@ -117,6 +147,7 @@
     </VCard>
   </VContainer>
 </template>
+
   
   <script setup lang="ts">
   
