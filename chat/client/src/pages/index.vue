@@ -49,8 +49,8 @@
   const rooms = ref(['']);
   const usernames = ref(['']);
   const state = reactive({
-    username: [''],
-    room: rooms[0],
+    username: '',
+    room: rooms.value[0],
   });
 
   onMounted(() => {
@@ -78,7 +78,7 @@
   };
 
 
-  function addRoom(roomName) {
+  function addRoom(roomName: string) {
   // 1. Получаем текущий список комнат
   const rooms = JSON.parse(localStorage.getItem('rooms') || '[]');
   
@@ -95,7 +95,7 @@
   }
 }
 
-function addUser(username) {
+function addUser(username: string) {
   // 1. Получаем текущий список usernames
   const usernames = JSON.parse(localStorage.getItem('usernames') || '[]');
   

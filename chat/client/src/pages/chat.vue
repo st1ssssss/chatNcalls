@@ -123,15 +123,56 @@
       <!-- Footer / Input -->
       <VCardActions class="pt-6">
         <form
-          class="w-100"
+          class="w-100 d-flex align-center"
           @submit.prevent="onSubmit"
         >
+          <!-- Кнопка вызова окна смайликов -->
+          <VBtn
+            icon
+            variant="text"
+            @click="toggleEmojiPicker"
+          >
+            <VIcon>mdi-emoticon-outline</VIcon>
+          </VBtn>
+
+          <!-- Окно смайликов -->
+          <VDialog
+            v-model="emojiPickerOpen"
+            width="400px"
+          >
+            <VCard>
+              <VCardTitle class="d-flex justify-space-between align-center">
+                <span>Выберите смайлик</span>
+                <VBtn
+                  icon
+                  @click="emojiPickerOpen = false"
+                >
+                  <VIcon>mdi-close</VIcon>
+                </VBtn>
+              </VCardTitle>
+              <VDivider />
+              <VCardText class="emoji-grid">
+                <VBtn
+                  v-for="emoji in emojis"
+                  :key="emoji"
+                  variant="text"
+                  class="emoji-btn"
+                  @click="addEmoji(emoji)"
+                >
+                  {{ emoji }}
+                </VBtn>
+              </VCardText>
+            </VCard>
+          </VDialog>
+    
+
           <VTextField
             v-model="message"
             hide-details
             variant="solo"
             elevation="0"
             rounded="lg"
+            class="mx-2"
           >
             <template #append-inner>
               <v-btn
@@ -148,9 +189,25 @@
   </VContainer>
 </template>
 
-  
-  <script setup lang="ts">
-  
+<script setup lang="ts">
+import { io, Socket } from 'socket.io-client';
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+const emojiPickerOpen = ref(false);
+const emojis  = [
+  '😀', '😂', '🥰', '😎', '🤔', '😍', '👍',
+  '❤️', '🔥', '🎉', '🤷', '🙏', '👋', '💯'
+] as const
+
+  const addEmoji = (emoji: typeof emojis[number]) => {
+    message.value += emoji
+  }
+
+  // Открыть/закрыть окно смайликов
+  const toggleEmojiPicker = () => {
+    emojiPickerOpen.value = !emojiPickerOpen.value;
+  };
+
   function handleClick() {
     console.log(message.value);
     socket.value?.emit('chatMessage', message.value);
@@ -172,9 +229,6 @@
     username: string;
     room: string;
   };
-  import { io, type Socket } from 'socket.io-client';
-import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
   const route = useRoute();
   const router = useRouter();
   
@@ -193,7 +247,7 @@ import { useRoute, useRouter } from 'vue-router';
     await nextTick(() => message.value = '')
   }
   onMounted(() => {
-    socket.value = io("http://localhost:3001");
+    socket.value = io("http://10.69.19.174:5001");
     const { username, room } = route.query as Partial<Chat>;
   
       if(!username || !room){

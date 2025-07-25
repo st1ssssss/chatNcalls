@@ -17,6 +17,7 @@
     "roboto-fontface": "*",
     "socket.io-client": "^4.8.1",
     "vue": "^3.4.31",
+    "vue-emoji-picker": "^1.0.3",
     "vuetify": "^3.6.14"
   },
   "devDependencies": {
