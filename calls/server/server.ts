@@ -27,12 +27,9 @@ io.on('connection', socket => {
       const existingUsers = Object.values(users).filter(
         user => user.room === roomId && user.id !== socket.id
       )
-
-      // Send existing users to new member
-      socket.emit('existing-users', existingUsers)
-
+      console.log('next emit')
       // Notify others about new user
-      socket.to(roomId).emit('new-user-connected', users[socket.id])
+      socket.to(roomId).emit('connectedUser', JSON.stringify({ id: users[socket.id], users }))
     } catch (error) {
       console.error('Join room error:', error)
     }
@@ -45,7 +42,9 @@ io.on('connection', socket => {
     socket.to(targetUser.id).emit(event, payload)
   }
 
-  socket.on('offer', handleWebRTCSignal('offer'))
+  socket.on('offer', () => {
+    console.log(socket.id)
+  })
   socket.on('answer', handleWebRTCSignal('answer'))
   socket.on('ice-candidate', handleWebRTCSignal('ice-candidate'))
 
@@ -60,6 +59,6 @@ io.on('connection', socket => {
   })
 })
 
-httpServer.listen(3002, () => {
-  console.log('Server running on port 3002')
+httpServer.listen(5000, () => {
+  console.log('Server running on port 5000')
 })
