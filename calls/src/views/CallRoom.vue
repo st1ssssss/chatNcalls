@@ -6,7 +6,7 @@
   <li class="flex" v-for="room in rooms" :key="room.id">
     <span>{{ room.name }}</span>
     <button class="rounded-xl py-2 px-4 transition duration-300 active:scale-98 bg-neutral-600 text-neutral-100 flex justify-center" @click="()=>{
-      router.push(`/call/${room.id}`)
+      router.push(`/rooms/${room.id}`)
     }">join {{ room.name }}</button>
   </li>
 </ul>
@@ -37,6 +37,6 @@ function createNewRoom() {
   const id = v4()
   rooms.value.push({name: 'room', id})
   localStorage.setItem('ROOMS', JSON.stringify(rooms.value))
-  router.push(`/call/${id}`)
+  router.push(`/rooms/${id}`)
 }
 </script>

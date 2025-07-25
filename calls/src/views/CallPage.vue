@@ -14,9 +14,8 @@
 <script setup lang="ts">
 import VideoCell from '@/components/VideoCell.vue';
 import { io, Socket } from 'socket.io-client';
-import { onMounted, ref } from 'vue';
-import { router } from '../router';
-
+import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
 let socket: Socket
 const localStream = ref<MediaStream>()
 const remoteStream = ref<MediaStream|null>()
@@ -26,7 +25,9 @@ const remoteId = ref<string>()
 const localVideo = ref<HTMLVideoElement>()
 const remoteVideo = ref<HTMLVideoElement>()
 const peerConnection = ref<RTCPeerConnection|null>()
+const roomID = ref<string>()
 const iceServers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+const route = useRoute()
 
 async function initializeMedia() {
   try {
@@ -86,13 +87,14 @@ onMounted(async () => {
   
   socket = io('http://localhost:5000');
   localId.value = socket.id;
-  const roomID = router
+  roomID.value = route.params.id as string
+  socket.emit('join-room', roomID.value)
   // Socket listeners
   socket.on('existing-users', (users) => {
     if (users.length > 0) remoteId.value = users[0].id;
   });
 
-  socket.on('connectedUser', async(user)=>{ handleUserJoined(user)});
+  socket.on('connectedUsers', (user)=>{ handleUserJoined(user)});
 
   // socket.value.on('offer', handleIncomingOffer);
 
@@ -111,6 +113,10 @@ onMounted(async () => {
 
   socket.on('user-disconnected', endCall);
 });
+
+onBeforeUnmount(()=>{
+  socket.emit('before-disconnect', roomID.value)
+})
 
 function endCall() {
   if (peerConnection.value) {
