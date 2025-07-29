@@ -20,14 +20,15 @@
               class="icon"
             >
           </div>
-          <VBtn
-            color="primary"
-            elevation="0"
-            class="text-capitalize"
+          <v-btn
+            icon
             @click="handleLeave"
           >
-            Leave {{ $route.query.room }}
-          </VBtn>
+            <v-icon
+              icon="mdi-door"
+              size="large"
+            />
+          </v-btn>
         </div>
       </VCardTitle>
 
@@ -168,6 +169,7 @@
 
           <VTextField
             v-model="message"
+            placeholder="Message"
             hide-details
             variant="solo"
             elevation="0"
@@ -176,7 +178,10 @@
           >
             <template #append-inner>
               <v-btn
-                class="bg-primary text-white px-6"
+                class="px-6"
+                :color="isMessageEmpty ? 'grey-lighten-3' : 'primary'"
+                :variant="isMessageEmpty ? 'tonal' : 'flat'"
+                :disabled="isMessageEmpty"
                 @click="handleClick"
               >
                 Send
@@ -198,6 +203,8 @@ const emojis  = [
   '😀', '😂', '🥰', '😎', '🤔', '😍', '👍',
   '❤️', '🔥', '🎉', '🤷', '🙏', '👋', '💯'
 ] as const
+
+  const isMessageEmpty = computed(() => !message.value || message.value.trim() === '')
 
   const addEmoji = (emoji: typeof emojis[number]) => {
     message.value += emoji
