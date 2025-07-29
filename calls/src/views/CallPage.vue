@@ -1,18 +1,17 @@
 <template>
   <div class="w-full h-full flex flex-col items-center justify-between">
     <div class="flex justify-between gap-3.5">
-      <VideoCell class="w-2xl h-96 bg-violet-300" ref="localVideo" autoplay muted playsinline></VideoCell>
-      <VideoCell class="w-2xl h-96 bg-violet-300" ref="remoteVideo" autoplay playsinline></VideoCell>
+      <video class="w-2xl h-96 bg-neutral-600 rounded-xl" ref="localVideo" autoplay muted playsinline></video>
+      <video class="w-2xl h-96 bg-neutral-600 rounded-xl" ref="remoteVideo" autoplay playsinline></video>
     </div>
     <div class="flex gap-1">
-      <button class="rounded-xl py-4 px-8 transition duration-300 active:scale-98 bg-neutral-600 text-neutral-100 flex justify-center"  @click="joinRoom">join</button>
-      <button class="rounded-xl py-4 px-8 transition duration-300 active:scale-98 bg-neutral-600 text-neutral-100 flex justify-center"  @click="startCall">call</button>
+      <button class="rounded-xl py-4 px-8 transition duration-300 active:scale-98 bg-neutral-600 text-neutral-100 flex justify-center"  @click="endCall">decline</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import VideoCell from '@/components/VideoCell.vue';
+import { router } from '@/router';
 import { io, Socket } from 'socket.io-client';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -26,12 +25,13 @@ const localVideo = ref<HTMLVideoElement>()
 const remoteVideo = ref<HTMLVideoElement>()
 const peerConnection = ref<RTCPeerConnection|null>()
 const roomID = ref<string>()
+const offer = ref()
 const iceServers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 const route = useRoute()
 
 async function initializeMedia() {
   try {
-    localStream.value = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    localStream.value = await navigator.mediaDevices.getUserMedia({ audio: true });
     if (localVideo.value) {
       localVideo.value.srcObject = localStream.value;
     }
@@ -40,13 +40,10 @@ async function initializeMedia() {
   }
 }
 
-function joinRoom() {
-  socket.emit('join-room', roomId);
-}
 
 async function startCall() {
   peerConnection.value = new RTCPeerConnection(iceServers)
-
+  await initializeMedia()
   remoteStream.value = new MediaStream()
   if(remoteVideo.value){
     remoteVideo.value.srcObject = remoteStream.value
@@ -65,14 +62,8 @@ async function startCall() {
     }
   };
 
-  peerConnection.value.onicecandidate = async (event)=> {
-    if(event.candidate){
-      console.log(event.candidate)
-    }
-  }
-
-  let offer = await peerConnection.value.createOffer()
-  await peerConnection.value.setLocalDescription(offer)
+  offer.value = await peerConnection.value.createOffer()
+  await peerConnection.value.setLocalDescription(offer.value)
 
 }
 
@@ -81,31 +72,36 @@ async function handleUserJoined (userId: string){
 }
 
 onMounted(async () => {
-  await initializeMedia();
-  //При переходе на эту страницу звонка, считывать с юрл id комнаты и отправлять запрос на сервер о присоединеии к комнате
-  //Далее при присоединеии отправлять оффер всем кто есть в комнате
   
   socket = io('http://localhost:5000');
   localId.value = socket.id;
   roomID.value = route.params.id as string
-  socket.emit('join-room', roomID.value)
+  await startCall()
+  socket.emit('join-room', {roomId: roomID.value, offer: offer.value})
   // Socket listeners
-  socket.on('existing-users', (users) => {
-    if (users.length > 0) remoteId.value = users[0].id;
+  socket.on('offer', async (offer) => {
+    peerConnection.value?.setRemoteDescription(new RTCSessionDescription(offer))
+    const answer = await peerConnection.value?.createAnswer()
+    await peerConnection.value?.setLocalDescription(answer)
+    socket.emit('answer', {roomId: roomID.value, answer: answer })
   });
+    peerConnection.value!.onicecandidate = async (event)=> {
+    if(event.candidate){
+      console.log(event.candidate)
+      socket.emit('ice-candidate', {roomId: roomID.value, candidate: event.candidate })
+    }
+  }
 
-  socket.on('connectedUsers', (user)=>{ handleUserJoined(user)});
-
-  // socket.value.on('offer', handleIncomingOffer);
-
-  socket.on('answer', async (payload: { answer: RTCSessionDescriptionInit }) => {
+  socket.on('answer', async (payload:any) => {
     if (!peerConnection.value) return;
-    await peerConnection.value.setRemoteDescription(new RTCSessionDescription(payload.answer));
+    console.log('Answer from signal: ', payload)
+    await peerConnection.value.setRemoteDescription(new RTCSessionDescription(payload));
   });
 
-  socket.on('ice-candidate', async (payload: { candidate: RTCIceCandidateInit }) => {
+  socket.on('ice-candidate', async (payload: any) => {
     try {
-      await peerConnection.value?.addIceCandidate(new RTCIceCandidate(payload.candidate));
+      console.log('ice from signal: ', payload)
+      await peerConnection.value?.addIceCandidate(new RTCIceCandidate(payload ));
     } catch (err) {
       console.error('ICE candidate error:', err);
     }
@@ -127,5 +123,6 @@ function endCall() {
     remoteStream.value.getTracks().forEach(track => track.stop());
     remoteStream.value = null;
   }
+  router.push('/rooms')
 }
 </script>
