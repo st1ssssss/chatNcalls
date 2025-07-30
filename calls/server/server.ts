@@ -10,52 +10,67 @@ interface User {
 const app = express()
 const httpServer = createServer(app)
 const io = new Server(httpServer, { cors: { origin: '*' } })
+const rooms: {
+  [key: string]: string[]
+} = {}
 
-const users: Record<string, User> = {}
+const users: {
+  [key: string]: {roomId: string}
+} = {}
 
 io.on('connection', socket => {
   console.log(`User connected: ${socket.id}`)
-  users[socket.id] = { id: socket.id }
 
   // Join room handler
-  socket.on('join-room', (roomId: string) => {
+  socket.on('join-room', ({roomId, offer}: {roomId:string, offer: RTCSessionDescriptionInit}) => {
     try {
-      users[socket.id].room = roomId
+      if(rooms[roomId] == null || rooms[roomId] == undefined){
+        rooms[roomId] = []
+      }
+      rooms[roomId].push(socket.id)
+      users[socket.id] = {roomId}
       socket.join(roomId)
 
       // Notify existing users
-      const existingUsers = Object.values(users).filter(
-        user => user.room === roomId && user.id !== socket.id
-      )
-      console.log('next emit')
+      const existingUsers = rooms[roomId].filter(el => el != socket.id)
+      if(existingUsers.length){
+        socket.to(roomId).emit('offer', offer)
+      }
       // Notify others about new user
-      socket.to(roomId).emit('connectedUser', JSON.stringify({ id: users[socket.id], users }))
+      io.to(roomId).emit('connectedUsers', JSON.stringify(rooms[roomId]))
     } catch (error) {
       console.error('Join room error:', error)
     }
   })
 
   // WebRTC signaling handlers
-  const handleWebRTCSignal = (event: string) => (payload: { targetUserId: string }) => {
-    const targetUser = users[payload.targetUserId]
-    if (!targetUser) return
-    socket.to(targetUser.id).emit(event, payload)
+  const handleWebRTCSignal = ({event, payload}: {event: 'answer'|'ice-candidate', payload: {roomId: string, answer?:any , candidate?: RTCIceCandidate}}) => {
+    console.log(event,payload)
+    const existingUsers = rooms[payload.roomId].filter(el => el != socket.id)
+      if(existingUsers.length){
+        switch (event){
+          case 'answer':
+            socket.to(payload.roomId).emit(event, payload.answer)
+            break
+          case 'ice-candidate':
+            socket.to(payload.roomId).emit(event, payload.candidate)
+            break
+        }
+      }
   }
 
-  socket.on('offer', () => {
-    console.log(socket.id)
-  })
-  socket.on('answer', handleWebRTCSignal('answer'))
-  socket.on('ice-candidate', handleWebRTCSignal('ice-candidate'))
+  socket.on('answer', (data: {roomId: string, answer: any})=>handleWebRTCSignal({event: 'answer', payload: data}))
+  socket.on('ice-candidate', (data: {roomId: string, candidate: RTCIceCandidate})=>handleWebRTCSignal({event: 'ice-candidate', payload: data}))
 
   // Cleanup on disconnect
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${socket.id}`)
-    const user = users[socket.id]
-    if (user?.room) {
-      socket.to(user.room).emit('user-disconnected', socket.id)
-    }
-    delete users[socket.id]
+    const room = users[socket.id]?.roomId
+    io.to(rooms[room]).emit('user-disconnected', socket.id)
+    console.log(rooms[room])
+    rooms[room] = rooms[room]?.filter(el=>el != socket.id)
+    console.log(rooms[room])
+
   })
 })
 
