@@ -1,11 +1,11 @@
 <template>
   <VContainer
     fluid
-    class="pa-0 fill-height d-flex align-start "
+    class="pa-0 fill-height d-flex align-start"
   >
     <VCard
       class="d-flex flex-column fill-height"
-      style="width: 100%; "
+      style="width: 100%;"
     >
       <!-- Header -->
       <VCardTitle
@@ -20,24 +20,24 @@
               class="icon"
             >
           </div>
-          <VBtn
-            color="primary"
-            elevation="0"
-            class="text-capitalize"
+          <v-btn
+            icon
             @click="handleLeave"
           >
-            Leave {{ $route.query.room }}
-          </VBtn>
+            <v-icon
+              icon="mdi-door"
+              size="large"
+            />
+          </v-btn>
         </div>
       </VCardTitle>
 
       <VDivider />
-
       <!-- Chat content -->
       <VCardText class="py-6 px-0 flex-grow-1 overflow-y-auto">
         <div
           class="d-flex fill-height"
-          style="border-radius: 10px; "
+          style="border-radius: 10px;"
         >
           <!-- Sidebar -->
           <div
@@ -68,7 +68,7 @@
 
             <v-list
               style="border-radius: 10px;"
-              class=" bg-white"
+              class="bg-white"
             >
               <v-list-item
                 v-for="(user, i) in users"
@@ -79,45 +79,57 @@
               </v-list-item>
             </v-list>
           </div>
-
-          <!-- Chat messages -->
-          <div class="overflow-y-auto pl-6 flex-fill">
+          <v-sheet
+            class="overflow-y-auto d-flex flex-column"
+            :style="{
+              height: 'calc(100% - 16px)',
+              minHeight: '200px',
+              maxHeight: '830px',
+              width: '100%',
+              minWidth: '400px'
+            }"
+          >
+            <!-- Chat messages -->
             <div
-              v-for="(chat, i) in chats"
-              :key="i"
-              class="bg-transparent w-full mb-3 d-flex"
-              :class="{
-                'justify-center': chat.username === 'Vue Chatapp Admin',
-                'justify-end': chat.username === route.query.username,
-                'justify-start': chat.username !== route.query.username,
-              }"
+              class="overflow-y-auto pl-6 flex-grow-1"
+              style="width: 100%;"
             >
               <div
-                class="px-6 py-2 w-50 rounded-md mb-3"
-                style="border-radius: 10px;"
+                v-for="(chat, i) in chats"
+                :key="i"
+                class="bg-transparent w-full mb-3 d-flex"
                 :class="{
-                  'bg-red-lighten-4': chat.username === 'Vue Chatapp Admin',
-                  'bg-blue-lighten-5': chat.username === route.query.username,
-                  'bg-light-green-lighten-4': chat.username !== route.query.username && chat.username !== 'Vue Chatapp Admin',
+                  'justify-center': chat.username === 'Vue Chatapp Admin',
+                  'justify-end': chat.username === route.query.username,
+                  'justify-start': chat.username !== route.query.username,
                 }"
               >
-                <div class="d-flex align-center gap-x-3">
-                  <div class="text-xs text-primary font-semibold mr-4">
-                    {{ chat.username }}
+                <div
+                  class="px-6 py-2 w-50 rounded-md mb-3"
+                  style="border-radius: 10px;"
+                  :class="{
+                    'bg-red-lighten-4': chat.username === 'Vue Chatapp Admin',
+                    'bg-blue-lighten-5': chat.username === route.query.username,
+                    'bg-light-green-lighten-4': chat.username !== route.query.username && chat.username !== 'Vue Chatapp Admin',
+                  }"
+                >
+                  <div class="d-flex align-center gap-x-3">
+                    <div class="text-xs text-primary font-semibold mr-4">
+                      {{ chat.username }}
+                    </div>
+                    <div class="text-xs">
+                      {{ chat.time }}
+                    </div>
                   </div>
-                  <div class="text-xs">
-                    {{ chat.time }}
+                  <div class="mt-1 text-body-1">
+                    {{ chat.text }}
                   </div>
-                </div>
-                <div class="mt-1 text-body-1">
-                  {{ chat.text }}
                 </div>
               </div>
             </div>
-          </div>
+          </v-sheet>
         </div>
       </VCardText>
-
       <VDivider />
 
       <!-- Footer / Input -->
@@ -165,10 +177,11 @@
             </VCard>
           </VDialog>
     
-
           <VTextField
             v-model="message"
+            placeholder="Message"
             hide-details
+            bg-color="grey-darken-3"
             variant="solo"
             elevation="0"
             rounded="lg"
@@ -176,10 +189,24 @@
           >
             <template #append-inner>
               <v-btn
-                class="bg-primary text-white px-6"
+                icon
+                :color="isMessageEmpty ? 'grey-lighten-2' : 'primary'"
+                :variant="isMessageEmpty ? 'text' : 'flat'"
+                :disabled="isMessageEmpty"
+                size="small"
+                class="ml-1"
+                density="comfortable"
                 @click="handleClick"
               >
-                Send
+                <v-icon size="small">
+                  mdi-arrow-up
+                </v-icon>
+                <v-tooltip
+                  activator="parent"
+                  location="top"
+                >
+                  Отправить
+                </v-tooltip>
               </v-btn>
             </template>
           </VTextField>
@@ -198,6 +225,8 @@ const emojis  = [
   '😀', '😂', '🥰', '😎', '🤔', '😍', '👍',
   '❤️', '🔥', '🎉', '🤷', '🙏', '👋', '💯'
 ] as const
+
+  const isMessageEmpty = computed(() => !message.value || message.value.trim() === '')
 
   const addEmoji = (emoji: typeof emojis[number]) => {
     message.value += emoji
@@ -246,6 +275,52 @@ const emojis  = [
     socket.value?.emit('chatMessage', message.value);
     await nextTick(() => message.value = '')
   }
+
+  // Проверяем поддержку уведомлений
+  const isNotificationSupported = 'Notification' in window;
+
+  // Запрашиваем разрешение на уведомления
+  function requestNotificationPermission() {
+    if (isNotificationSupported && Notification.permission !== 'granted') {
+      Notification.requestPermission().then(permission => {
+        console.log('Notification permission:', permission);
+      });
+    }
+  }
+
+  // Показ уведомления
+  function showNotification(title: string, message: string) {
+    if (isNotificationSupported && Notification.permission === 'granted') {
+      new Notification(title, {
+        body: message,
+        icon: '/assets/Icon.svg',
+      });
+    }
+  }
+
+  // В компоненте чата (Chat.vue)
+  function playNotificationSound() {
+    const audio = new Audio('/notification.mp3'); // Путь к файлу звука
+    audio.play().catch(e => console.error('Ошибка воспроизведения:', e));
+  }
+
+  // Отслеживание новых сообщений
+  watch(
+    () => chats.value.length,
+    (newLength, oldLength) => {
+      if (newLength > oldLength) {
+        const lastMessage = chats.value[newLength - 1];
+        if (lastMessage.username !== route.query.username && document.hidden) {
+          showNotification(
+            `Новое сообщение от ${lastMessage.username}`,
+            lastMessage.text
+          );
+          playNotificationSound(); // Звук
+        }
+      }
+    }
+  );
+
   onMounted(() => {
     socket.value = io("http://10.69.19.174:5001");
     const { username, room } = route.query as Partial<Chat>;
@@ -267,7 +342,7 @@ const emojis  = [
       socket.value?.on('message', (message: Chat) => {
         chats.value.push(message)
       })
-  
+    requestNotificationPermission();
   });
   onBeforeUnmount(() => {
     console.log('[DISCONNECT_BLOCK]');

@@ -1,0 +1,14 @@
+<svg width="32" height="32" viewBox="64 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Градиентный фон -->
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#172554"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Буква М с эффектом переплетения -->
+  <path transform="translate(53, -4)" d="M27.92,30.05v24.51h-10.1v-36.2c0-0.71,0.27-0.93,1.09-0.93h8.95c0.71,0,1.09,0.22,1.36,0.71l14.3,22.11 l13.65-21.89c0.38-0.6,0.6-0.93,1.42-0.93h9.28v37.12h-10.1V29.88L43.37,53.47h-0.22L27.92,30.05z" stroke="#172554" fill="white"/>
+
+
+</svg>
