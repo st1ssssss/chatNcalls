@@ -1,0 +1,47 @@
+name: Multi-project CI (Parallel)
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-chat-client:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build chat client
+        working-directory: ./chat/client
+        run: |
+          npm install
+          npm run build
+
+  build-chat-server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build chat server
+        working-directory: ./chat/server
+        run: |
+          npm install
+          npm run build
+
+  build-calls:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build calls
+        working-directory: ./calls
+        run: |
+          npm install
+          npm run build
