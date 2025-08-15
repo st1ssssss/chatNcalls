@@ -57,4 +57,5 @@ jobs:
         working-directory: ./calls/server
         run: |
           npm install
+          npm install --save-dev @types/express @types/socket.io
           npm run build
