@@ -1,8 +1,8 @@
 <template>
   <div class="w-full h-full flex flex-col items-center justify-between">
     <div class="flex justify-between gap-3.5">
-      <video class="w-2xl h-96 bg-neutral-600 rounded-xl" ref="localVideo" autoplay muted playsinline></video>
-      <video class="w-2xl h-96 bg-neutral-600 rounded-xl" ref="remoteVideo" autoplay playsinline></video>
+      <video class="w-2xl h-96 bg-neutral-600 rounded-xl object-cover" ref="localVideo" autoplay muted playsinline></video>
+      <video class="w-2xl h-96 bg-neutral-600 rounded-xl object-cover" ref="remoteVideo" autoplay playsinline></video>
     </div>
     <div class="flex gap-1">
       <button class="rounded-xl py-4 px-8 transition duration-300 active:scale-98 bg-neutral-600 text-neutral-100 flex justify-center"  @click="endCall">decline</button>
@@ -18,9 +18,7 @@ import { useRoute } from 'vue-router';
 let socket: Socket
 const localStream = ref<MediaStream>()
 const remoteStream = ref<MediaStream|null>()
-const roomId = '1234'
 const localId = ref<string>()
-const remoteId = ref<string>()
 const localVideo = ref<HTMLVideoElement>()
 const remoteVideo = ref<HTMLVideoElement>()
 const peerConnection = ref<RTCPeerConnection|null>()
@@ -40,14 +38,17 @@ async function initializeMedia() {
   }
 }
 
+// function toggleCam(){
+//   if()
+//   localStream.value?.getTracks().forEach(track => {
+//     track.stop()    
+//   });
+// }
 
 async function startCall() {
   peerConnection.value = new RTCPeerConnection(iceServers)
   await initializeMedia()
   remoteStream.value = new MediaStream()
-  if(remoteVideo.value){
-    remoteVideo.value.srcObject = remoteStream.value
-  }
 
   localStream.value!.getTracks().forEach(track => {
     peerConnection.value?.addTrack(track, localStream.value!);
@@ -67,12 +68,9 @@ async function startCall() {
 
 }
 
-async function handleUserJoined (userId: string){
-  console.log('A new user joined the channel: ', userId)
-}
-
 onMounted(async () => {
   
+  // socket = io('http://10.69.19.174:5000');
   socket = io('http://localhost:5000');
   localId.value = socket.id;
   roomID.value = route.params.id as string

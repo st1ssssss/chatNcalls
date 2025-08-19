@@ -1,18 +1,21 @@
 <template>
+  <header class="flex items-center justify-between px-3 py-3 bg-neutral-600 rounded-b-lg">
+    <div class="logo">
+      <h1>
+        Метран CHAT
+      </h1>
+    </div>
+    <Avatar :img-src="profilePic" :user-name="user"/>
+  </header>
   <h2>callRoom</h2>
-  <Avatar :img-src="profilePic" :user-name="user"/>
   <button class="rounded-xl py-2 px-4 transition duration-300 active:scale-98 bg-neutral-600 text-neutral-100 flex justify-center" @click="createNewRoom">Create new room</button>
-<ul>
-  <li class="flex" v-for="room in rooms" :key="room.id">
-    <span>{{ room.name }}</span>
-    <button class="rounded-xl py-2 px-4 transition duration-300 active:scale-98 bg-neutral-600 text-neutral-100 flex justify-center" @click="()=>{
-      router.push(`/rooms/${room.id}`)
-    }">join {{ room.name }}</button>
-  </li>
+<ul class="grid grid-cols-4 gap-4">
+  <RoomCard v-for="room in rooms" :key="room.id" :room-id="room.id" :room-name="room.name" :description="room.description ? room.description : null"/>
 </ul>
 </template>
 <script setup lang="ts">
 import Avatar from '@/components/Avatar.vue'
+import RoomCard from '@/components/RoomCard.vue'
 import { router } from '@/router'
 import { v4 } from 'uuid'
 import { onMounted, ref } from 'vue'

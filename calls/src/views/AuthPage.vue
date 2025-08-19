@@ -1,5 +1,5 @@
 <template>
-    <p class="text-3xl font-bold">AuthPage</p>
+    <p class="text-3xl font-bold">Metran Call</p>
     <div class="flex flex-col items-center justify-center">
       <label for="profilePicture">
         <Avatar :img-src="userPicture" :user-name="userName" />
@@ -23,7 +23,12 @@ const inputFile = document.getElementById('profilePicture')
 const userName = ref('')
 const userPicture = ref('')
 onMounted(()=>{
-  localStorage.setItem('ROOMS', JSON.stringify([{name:'DTM scrum', id: v4()}, {name: 'MTG', id: v4()}]))
+  localStorage.setItem('ROOMS', JSON.stringify([
+    {name:'DTM scrum', id: v4()}, {name: 'MTG', id: v4(), description: 'Some description about room'},
+    {name:'DTM scrum', id: v4()}, {name: 'MTG', id: v4()},
+    {name:'DTM scrum', id: v4()}, {name: 'MTG', id: v4()},
+    {name:'DTM scrum', id: v4()}, {name: 'MTG', id: v4()},
+]))
 })
 
 function handleUserName(event:Event){
