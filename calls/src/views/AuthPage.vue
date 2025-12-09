@@ -27,7 +27,7 @@ onMounted(()=>{
     {name:'DTM scrum', id: v4()}, {name: 'MTG', id: v4(), description: 'Some description about room'},
     {name:'DTM scrum', id: v4()}, {name: 'MTG', id: v4()},
     {name:'DTM scrum', id: v4()}, {name: 'MTG', id: v4()},
-    {name:'DTM scrum', id: v4()}, {name: 'MTG', id: v4()},
+    {name:'DTM scrum', id: v4()}, 
 ]))
 })
 
