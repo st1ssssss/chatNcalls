@@ -1,11 +1,19 @@
 <template>
   <div class="w-full h-full flex flex-col items-center justify-between">
     <div class="flex justify-between gap-3.5">
-      <video class="w-2xl h-96 bg-neutral-600 rounded-xl" ref="localVideo" autoplay muted playsinline></video>
-      <video class="w-2xl h-96 bg-neutral-600 rounded-xl" ref="remoteVideo" autoplay playsinline></video>
+      <video class="w-2xl h-96 bg-neutral-600 rounded-xl object-cover" ref="localVideo" autoplay muted playsinline></video>
+      <video class="w-2xl h-96 bg-neutral-600 rounded-xl object-cover" ref="remoteVideo" autoplay playsinline></video>
     </div>
-    <div class="flex gap-1">
-      <button class="rounded-xl py-4 px-8 transition duration-300 active:scale-98 bg-neutral-600 text-neutral-100 flex justify-center"  @click="endCall">decline</button>
+    <div class="flex gap-1 pt-2">
+      <button class="rounded-xl py-4 px-4 transition duration-300 active:scale-98 bg-neutral-600 text-neutral-100 flex justify-center"  @click="toggleMic">
+        <span class="material-symbols-outlined">{{mic ? 'mic' : 'mic_off'}}</span>
+      </button>
+      <button class="rounded-xl py-4 px-4 transition duration-300 active:scale-98 bg-neutral-600 text-neutral-100 flex justify-center"  @click="toggleCam">
+        <span class="material-icons-outlined">{{videocam ? 'videocam' : 'videocam_off'}}</span>
+      </button>
+      <button class="rounded-xl py-4 px-4 transition duration-300 active:scale-98 bg-red-600 text-neutral-100 flex justify-center"  @click="endCall">
+        <span class="material-icons-outlined">call_end</span>
+      </button>
     </div>
   </div>
 </template>
@@ -18,20 +26,27 @@ import { useRoute } from 'vue-router';
 let socket: Socket
 const localStream = ref<MediaStream>()
 const remoteStream = ref<MediaStream|null>()
-const roomId = '1234'
 const localId = ref<string>()
-const remoteId = ref<string>()
 const localVideo = ref<HTMLVideoElement>()
 const remoteVideo = ref<HTMLVideoElement>()
 const peerConnection = ref<RTCPeerConnection|null>()
 const roomID = ref<string>()
 const offer = ref()
+const mic = ref(false)
+const videocam = ref(false)
 const iceServers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 const route = useRoute()
+const mediaStreamMic = ref<MediaStream>()
 
 async function initializeMedia() {
   try {
-    localStream.value = await navigator.mediaDevices.getUserMedia({ audio: true });
+    localStream.value = await navigator.mediaDevices.getUserMedia({  video: {
+                      width: { ideal: 1280 },
+                      height: { ideal: 720 },
+                      facingMode: 'user'
+                  }  });
+    mediaStreamMic.value = await navigator.mediaDevices.getUserMedia({ audio: true });
+
     if (localVideo.value) {
       localVideo.value.srcObject = localStream.value;
     }
@@ -40,17 +55,61 @@ async function initializeMedia() {
   }
 }
 
+async function toggleCam(){
+  if(!videocam.value){
+    try {
+              // Включаем камеру
+              localStream.value = await navigator.mediaDevices.getUserMedia({ 
+                  video: {
+                      width: { ideal: 1280 },
+                      height: { ideal: 720 },
+                      facingMode: 'user'
+                  } 
+              });
+              if(localVideo.value){
+                localVideo.value.srcObject = localStream.value;
+              }else{
+                throw Error('No access to cam')
+              }
+          } catch (error) {
+              console.error('Ошибка доступа к камере:', error);
+          }
+  }else{
+    localStream.value?.getTracks().forEach(track => track.stop());
+    if(localVideo.value){
+      localVideo.value.srcObject = null;
+    }
+
+  }   
+  videocam.value = !videocam.value
+}
+
+async function toggleMic() {
+  if(mic.value && mediaStreamMic.value){
+    mediaStreamMic.value.getTracks().forEach(track => track.stop());
+    console.log('Mic is off')
+
+  }else{
+    try{
+      mediaStreamMic.value = await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log('Mic is on', mediaStreamMic.value)
+    }catch (error){
+      console.log(error)
+    }
+  }
+  mic.value = !mic.value
+}
 
 async function startCall() {
   peerConnection.value = new RTCPeerConnection(iceServers)
   await initializeMedia()
   remoteStream.value = new MediaStream()
-  if(remoteVideo.value){
-    remoteVideo.value.srcObject = remoteStream.value
-  }
 
   localStream.value!.getTracks().forEach(track => {
     peerConnection.value?.addTrack(track, localStream.value!);
+  });
+  mediaStreamMic.value!.getTracks().forEach(track => {
+    peerConnection.value?.addTrack(track, mediaStreamMic.value!);
   });
 
   if (remoteVideo.value) {
@@ -67,12 +126,9 @@ async function startCall() {
 
 }
 
-async function handleUserJoined (userId: string){
-  console.log('A new user joined the channel: ', userId)
-}
-
 onMounted(async () => {
   
+  // socket = io('http://10.69.19.174:5000');
   socket = io('http://localhost:5000');
   localId.value = socket.id;
   roomID.value = route.params.id as string
