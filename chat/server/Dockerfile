@@ -1,7 +1,7 @@
-# Этап сборки (builder)
-FROM node:16-alpine as builder
+# Этап сборки
+FROM node:16-alpine AS builder
 
-# 1. Устанавливаем все необходимые инструменты для сборки
+# 1. Устанавливаем инструменты для сборки
 RUN apk add --no-cache \
     python3 \
     make \
@@ -12,32 +12,40 @@ RUN apk add --no-cache \
 # 2. Настраиваем рабочую директорию
 WORKDIR /app
 
-# 3. Копируем только package.json для лучшего кэширования
+# 3. Копируем package.json
 COPY package*.json ./
 
-# 4. Явно пересобираем sqlite3 для правильной архитектуры
-RUN npm install sqlite3 --build-from-source --target_arch=x64
+# 4. Собираем sqlite3 и устанавливаем зависимости
+RUN npm config set python /usr/bin/python3 && \
+    npm install sqlite3 --build-from-source && \
+    npm install --production
 
-# 5. Устанавливаем остальные зависимости
-RUN npm install --production
-
-# Этап запуска (production)
+# Этап запуска
 FROM node:16-alpine
 
-# 6. Устанавливаем только runtime-зависимости
+# 5. Устанавливаем runtime зависимости
 RUN apk add --no-cache sqlite
 
-# 7. Настраиваем рабочую директорию и пользователя
+# 6. Настраиваем пользователя
 WORKDIR /app
 RUN chown node:node /app
 USER node
 
-# 8. Копируем только необходимые файлы
-COPY --from=builder --chown=node:node /app/node_modules ./node_modules
+# 7. Копируем ВСЁ из builder
+COPY --from=builder --chown=node:node /app /app
+
+# 8. Копируем исходный код (если не скопировался)
 COPY --chown=node:node . .
 
-# 9. Проверяем целостность SQLite3
-RUN node -e "require('sqlite3').verbose()" || echo "SQLite3 check failed"
+# 9. Исправляем путь к node
+ENV PATH /app/node_modules/.bin:$PATH
 
+# 10. Проверяем SQLite
+RUN node -e "try { const sqlite3 = require('sqlite3').verbose(); console.log('SQLite3 OK'); } catch(e) { console.error('SQLite3 error:', e.message); process.exit(1); }"
+
+# 11. Указываем порт через переменную окружения
+ENV PORT=5001
 EXPOSE 5001
+
+# 12. Запускаем
 CMD ["node", "index.js"]
