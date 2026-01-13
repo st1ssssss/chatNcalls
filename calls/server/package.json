@@ -18,6 +18,7 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
+    "mediasoup": "^3.19.14",
     "ts-node": "^10.9.2",
     "ws": "^8.18.1"
   }

@@ -16,6 +16,8 @@
     "express": "^4.21.2",
     "freeice": "^2.2.2",
     "inter-ui": "^4.1.0",
+    "mediasoup": "^3.19.14",
+    "mediasoup-client": "^3.18.3",
     "peerjs": "^1.5.4",
     "pinia": "^3.0.1",
     "socket.io": "^4.8.1",
