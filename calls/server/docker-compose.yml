@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  mediasoup-server:
+    build: .
+    ports:
+      - '5000:5000'
+      - '40000-40100:40000-40100/udp' # для медиа-трафика
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./:/app # монтируем код для hot-reload
+      - /app/node_modules # защита node_modules внутри контейнера
+    command: npx ts-node server.ts # запускаем через ts-node

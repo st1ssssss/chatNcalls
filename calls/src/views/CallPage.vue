@@ -11,11 +11,11 @@
     </div>
     <div class="flex gap-1 pt-2">
       <button class="rounded-xl py-4 px-4 transition duration-300 active:scale-98 bg-neutral-600 text-neutral-100 flex justify-center"  
-              @click="toggleMic">
+              >
         <span class="material-symbols-outlined">{{ mic ? 'mic' : 'mic_off' }}</span>
       </button>
       <button class="rounded-xl py-4 px-4 transition duration-300 active:scale-98 bg-neutral-600 text-neutral-100 flex justify-center"  
-              @click="toggleCam">
+              >
         <span class="material-icons-outlined">{{ videocam ? 'videocam' : 'videocam_off' }}</span>
       </button>
       <button class="rounded-xl py-4 px-4 transition duration-300 active:scale-98 bg-red-600 text-neutral-100 flex justify-center"  
@@ -70,115 +70,115 @@ async function initializeMedia() {
   }
 }
 
-async function toggleCam() {
-  if (!videocam.value) {
-    try {
-      const newStream = await navigator.mediaDevices.getUserMedia({ 
-        video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          facingMode: 'user'
-        }
-      });
+// async function toggleCam() {
+//   if (!videocam.value) {
+//     try {
+//       const newStream = await navigator.mediaDevices.getUserMedia({ 
+//         video: {
+//           width: { ideal: 1280 },
+//           height: { ideal: 720 },
+//           facingMode: 'user'
+//         }
+//       });
       
-      const newVideoTrack = newStream.getVideoTracks()[0];
+//       const newVideoTrack = newStream.getVideoTracks()[0];
       
-      // Обновляем producer
-      const videoProducer = Array.from(room.producers.values())
-        .find((p: any) => p.track.kind === 'video');
+//       // Обновляем producer
+//       const videoProducer = Array.from(room.producers.values())
+//         .find((p: any) => p.track.kind === 'video');
       
-      if (videoProducer && newVideoTrack) {
-        await videoProducer.replaceTrack({ track: newVideoTrack });
-      } else if (newVideoTrack) {
-        // Создаем новый producer
-        const sendTransport = room.transports.get('send');
-        if (sendTransport) {
-          const producer = await sendTransport.produce({ track: newVideoTrack });
-          room.producers.set(producer.id, producer);
-        }
-      }
+//       if (videoProducer && newVideoTrack) {
+//         await videoProducer.replaceTrack({ track: newVideoTrack });
+//       } else if (newVideoTrack) {
+//         // Создаем новый producer
+//         const sendTransport = room.transports.get('send');
+//         if (sendTransport) {
+//           const producer = await sendTransport.produce({ track: newVideoTrack });
+//           room.producers.set(producer.id, producer);
+//         }
+//       }
       
-      if (localVideo.value && localStream.value) {
-        const oldTrack = localStream.value.getVideoTracks()[0];
-        if (oldTrack) {
-          localStream.value.removeTrack(oldTrack);
-          oldTrack.stop();
-        }
-        localStream.value.addTrack(newVideoTrack);
-        localVideo.value.srcObject = localStream.value;
-      }
+//       if (localVideo.value && localStream.value) {
+//         const oldTrack = localStream.value.getVideoTracks()[0];
+//         if (oldTrack) {
+//           localStream.value.removeTrack(oldTrack);
+//           oldTrack.stop();
+//         }
+//         localStream.value.addTrack(newVideoTrack);
+//         localVideo.value.srcObject = localStream.value;
+//       }
       
-      // Останавливаем старый stream
-      newStream.getTracks().forEach(track => {
-        if (track.kind === 'audio') track.stop();
-      });
+//       // Останавливаем старый stream
+//       newStream.getTracks().forEach(track => {
+//         if (track.kind === 'audio') track.stop();
+//       });
       
-    } catch (error) {
-      console.error('Error accessing camera:', error);
-    }
-  } else {
-    // Отключаем видео
-    const videoProducer = Array.from(room.producers.values())
-      .find((p: any) => p.track.kind === 'video');
+//     } catch (error) {
+//       console.error('Error accessing camera:', error);
+//     }
+//   } else {
+//     // Отключаем видео
+//     const videoProducer = Array.from(room.producers.values())
+//       .find((p: any) => p.track.kind === 'video');
     
-    if (videoProducer) {
-      videoProducer.close();
-    }
+//     if (videoProducer) {
+//       videoProducer.close();
+//     }
     
-    const videoTrack = localStream.value?.getVideoTracks()[0];
-    if (videoTrack) {
-      videoTrack.stop();
-      localStream.value?.removeTrack(videoTrack);
-    }
-  }
-  videocam.value = !videocam.value;
-}
+//     const videoTrack = localStream.value?.getVideoTracks()[0];
+//     if (videoTrack) {
+//       videoTrack.stop();
+//       localStream.value?.removeTrack(videoTrack);
+//     }
+//   }
+//   videocam.value = !videocam.value;
+// }
 
-async function toggleMic() {
-  if (mic.value) {
-    // Отключаем микрофон
-    const audioProducer = Array.from(room.producers.values())
-      .find((p: any) => p.track.kind === 'audio');
+// async function toggleMic() {
+//   if (mic.value) {
+//     // Отключаем микрофон
+//     const audioProducer = Array.from(room.producers.values())
+//       .find((p: any) => p.track.kind === 'audio');
     
-    if (audioProducer) {
-      audioProducer.close();
-    }
+//     if (audioProducer) {
+//       audioProducer.close();
+//     }
     
-    const audioTrack = localStream.value?.getAudioTracks()[0];
-    if (audioTrack) {
-      audioTrack.stop();
-    }
-  } else {
-    // Включаем микрофон
-    try {
-      const newStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const newAudioTrack = newStream.getAudioTracks()[0];
+//     const audioTrack = localStream.value?.getAudioTracks()[0];
+//     if (audioTrack) {
+//       audioTrack.stop();
+//     }
+//   } else {
+//     // Включаем микрофон
+//     try {
+//       const newStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+//       const newAudioTrack = newStream.getAudioTracks()[0];
       
-      const sendTransport = room.transports.get('send');
-      if (sendTransport && newAudioTrack) {
-        const producer = await sendTransport.produce({ track: newAudioTrack });
-        room.producers.set(producer.id, producer);
-      }
+//       const sendTransport = room.transports.get('send');
+//       if (sendTransport && newAudioTrack) {
+//         const producer = await sendTransport.produce({ track: newAudioTrack });
+//         room.producers.set(producer.id, producer);
+//       }
       
-      if (localStream.value) {
-        const oldTrack = localStream.value.getAudioTracks()[0];
-        if (oldTrack) {
-          localStream.value.removeTrack(oldTrack);
-          oldTrack.stop();
-        }
-        localStream.value.addTrack(newAudioTrack);
-      }
+//       if (localStream.value) {
+//         const oldTrack = localStream.value.getAudioTracks()[0];
+//         if (oldTrack) {
+//           localStream.value.removeTrack(oldTrack);
+//           oldTrack.stop();
+//         }
+//         localStream.value.addTrack(newAudioTrack);
+//       }
       
-      // Останавливаем старый stream
-      newStream.getTracks().forEach(track => {
-        if (track.kind === 'video') track.stop();
-      });
-    } catch (error) {
-      console.error('Error accessing microphone:', error);
-    }
-  }
-  mic.value = !mic.value;
-}
+//       // Останавливаем старый stream
+//       newStream.getTracks().forEach(track => {
+//         if (track.kind === 'video') track.stop();
+//       });
+//     } catch (error) {
+//       console.error('Error accessing microphone:', error);
+//     }
+//   }
+//   mic.value = !mic.value;
+// }
 
 // Mediasoup functions
 async function createSendTransport() {

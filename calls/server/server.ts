@@ -24,17 +24,23 @@ let worker: mediasoup.types.Worker
 
 // Инициализация mediasoup worker
 async function initMediaSoup() {
-  worker = await mediasoup.createWorker({
-    rtcMinPort: 10000,
-    rtcMaxPort: 10100,
-    logLevel: 'warn',
-    logTags: ['info', 'ice', 'dtls', 'rtp', 'srtp', 'rtcp']
-  })
+  try {
+    worker = await mediasoup.createWorker({
+      rtcMinPort: 40000,
+      rtcMaxPort: 40100,
+      logLevel: 'debug',
+      logTags: ['info', 'ice', 'dtls', 'rtp', 'srtp', 'rtcp']
+    })
+    console.log(`MediaSoup worker created successfully! PID: ${worker.pid}`)
 
-  worker.on('died', () => {
-    console.error('mediasoup worker died')
+    worker.on('died', (error) => {
+      console.error('MediaSoup worker died:', error)
+    })
+  } catch (error) {
+    console.error('Failed to create MediaSoup worker:', error)
     process.exit(1)
-  })
+  }
+
 }
 
 // Создание или получение комнаты
