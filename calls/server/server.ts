@@ -307,6 +307,25 @@ io.on('connection', socket => {
       callback({ error: error.message })
     }
   })
+  socket.on('request-producers', ({ roomId, peerId }) => {
+    try {
+      const room = rooms.get(roomId)
+      if (!room) return
+
+      const targetPeer = room.peers.get(peerId)
+      if (!targetPeer) return
+
+      targetPeer.producers.forEach((producer) => {
+        socket.emit('new-producer', {
+          socketId: peerId,
+          producerId: producer.id,
+          kind: producer.kind
+        })
+      })
+    } catch (error) {
+      console.error('Request producers handler error:', error)
+    }
+  })
   
   socket.on('producer-closed', ({ roomId, producerId }) => {
     try {

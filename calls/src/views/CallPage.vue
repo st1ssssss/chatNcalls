@@ -402,8 +402,9 @@ async function startCall() {
   }
 }
 
+const url =  'http://localhost:5000'
 onMounted(async () => {
-  socket = io('http://localhost:5000');
+  socket = io(url);
   roomID.value = route.params.id as string;
   
   // Socket listeners
